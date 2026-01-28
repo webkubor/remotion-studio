@@ -27,7 +27,7 @@
   },
   "audio": {
     "enabled": true,
-    "src": "温柔.wav",
+    "src": "1.wav",
     "volume": 0.6,
     "startFrame": 0
   },

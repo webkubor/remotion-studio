@@ -9,7 +9,7 @@ export const SkillsIntroComposition = () => {
   return (
     <>
       <Composition
-        id={skillsIntroConfig.meta.id}
+        id="技术分享系列"
         component={SkillsIntro}
         durationInFrames={skillsIntroConfig.video.durationInFrames}
         fps={skillsIntroConfig.video.fps}

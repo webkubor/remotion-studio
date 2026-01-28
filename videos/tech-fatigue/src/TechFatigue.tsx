@@ -1,122 +1,215 @@
-import { AbsoluteFill, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig, Audio, staticFile } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, spring, useCurrentFrame, useVideoConfig, Audio, staticFile, random } from "remotion";
+import { useAudioData, visualizeAudio } from "@remotion/media-utils";
 import config from "../data/config.json";
-import { getTheme } from "../styles/theme";
+import { Fonts } from "./Fonts";
 
-const theme = getTheme(config);
+// --- 配置色板 ---
+const COLORS = [
+  "#FFD700", // Gold
+  "#FF6B6B", // Red
+  "#4ECDC4", // Teal
+  "#FFE66D", // Yellow
+  "#1A535C", // Dark Blue
+  "#F7FFF7", // White-ish
+  "#FF9F1C", // Orange
+  "#2EC4B6"  // Cyan
+];
 
-// 自定义高级背景：噪点 + 极简流动光晕
-const MinimalistBackground = () => {
+// --- 节奏提取 Hook ---
+const useMusicBeat = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const audioData = useAudioData(staticFile(config.audio.src));
+
+  if (!audioData) {
+    return 1;
+  }
+
+  // 提取当前帧的振幅 (Amplitude)
+  // visualizeAudio 返回一个表示频谱的数组，我们可以取均值作为音量
+  // 这里的 frame 需要适当偏移，因为 Audio 组件可能也在播放
+  const visualization = visualizeAudio({
+    fps,
+    frame,
+    audioData,
+    numberOfSamples: 16, // 只需要少量样本计算总体音量
+  });
+
+  // 计算平均音量 (0~1)
+  const volume = visualization.reduce((a, b) => a + b, 0) / visualization.length;
   
-  // 极慢的流动效果
-  const gradientMove = frame * 0.15;
+  // 放大效果，让微小的声音也能产生动效
+  // 基础缩放 1.0，最大缩放 1.15
+  return 1 + Math.min(0.15, volume * 4); 
+};
+
+// --- 工具组件 ---
+
+// 1. 疯狂背景：每句话换个颜色，带点噪点 + 随音乐闪烁
+const CrazyBackground = ({ index, duration }: { index: number, duration: number }) => {
+  const frame = useCurrentFrame();
+  const beatScale = useMusicBeat(); // 获取节奏
   
+  const baseColor = COLORS[index % COLORS.length];
+  
+  // 简单的条纹纹理
+  const stripeOffset = (frame * 2) % 100;
+  
+  // 随节奏改变亮度
+  const brightness = 100 + (beatScale - 1) * 50; // 100% -> 107.5%
+
   return (
-    <AbsoluteFill style={{ backgroundColor: "#FAFAFA", overflow: "hidden" }}>
-      {/* 1. 细微的噪点纹理 (通过 SVG 滤镜或 base64 图片模拟，这里用 CSS radial gradient 模拟光感) */}
-      <AbsoluteFill style={{ opacity: 0.6 }}>
-        <div style={{ 
-          position: "absolute",
-          top: "-50%",
-          left: "-50%",
-          right: "-50%",
-          bottom: "-50%",
-          backgroundImage: `radial-gradient(circle at 50% 50%, #000000 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
-          opacity: 0.03,
-          transform: "rotate(20deg)"
+    <AbsoluteFill style={{ backgroundColor: baseColor, overflow: 'hidden', filter: `brightness(${brightness}%)` }}>
+      {/* 动态条纹 */}
+      <div style={{
+        position: 'absolute',
+        top: -100, left: -100, right: -100, bottom: -100,
+        backgroundImage: `repeating-linear-gradient(
+          45deg,
+          rgba(0,0,0,0.05) 0px,
+          rgba(0,0,0,0.05) 20px,
+          transparent 20px,
+          transparent 40px
+        )`,
+        transform: `translateY(${stripeOffset}px)`
+      }} />
+      
+      {/* 噪点覆盖 */}
+      <AbsoluteFill style={{ opacity: 0.15, filter: 'contrast(150%) brightness(100%)' }}>
+        <div style={{
+          width: '100%', height: '100%',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")`
         }} />
       </AbsoluteFill>
-
-      {/* 2. 动态光晕 - 左上角冷色 */}
-      <div style={{ 
-        position: "absolute",
-        top: "-20%",
-        left: "-10%",
-        width: "80%",
-        height: "80%",
-        background: "radial-gradient(circle, rgba(200, 220, 255, 0.15) 0%, transparent 70%)",
-        filter: "blur(60px)",
-        transform: `translate(${Math.sin(gradientMove * 0.02) * 50}px, ${Math.cos(gradientMove * 0.03) * 50}px)`,
-      }} />
-
-      {/* 3. 动态光晕 - 右下角暖色 */}
-      <div style={{ 
-        position: "absolute",
-        bottom: "-20%",
-        right: "-10%",
-        width: "90%",
-        height: "90%",
-        background: "radial-gradient(circle, rgba(255, 230, 200, 0.12) 0%, transparent 70%)",
-        filter: "blur(80px)",
-        transform: `translate(${Math.cos(gradientMove * 0.025) * 50}px, ${Math.sin(gradientMove * 0.035) * 50}px)`,
-      }} />
     </AbsoluteFill>
   );
 };
 
-const TextSlide = ({ text, type, duration }: { text: string; type?: string; duration: number }) => {
+// 2. 故障文字组件
+const GlitchText = ({ text, delay }: { text: string, delay: number }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-
-  // 进场动画：模糊 + 上浮 + 透明度
-  const opacity = interpolate(frame, [0, 20], [0, 1], { extrapolateRight: "clamp" });
-  const blur = interpolate(frame, [0, 20], [20, 0], { extrapolateRight: "clamp" });
-  const translateY = interpolate(frame, [0, 25], [40, 0], { extrapolateRight: "clamp", easing: (t) => t * (2 - t) }); // Ease out quad
+  const beatScale = useMusicBeat(); // 获取节奏
   
-  // 出场动画
-  const outOpacity = interpolate(frame, [duration - 15, duration], [1, 0], { extrapolateRight: "clamp" });
-  const outScale = interpolate(frame, [duration - 15, duration], [1, 0.95], { extrapolateRight: "clamp" });
-
-  const currentOpacity = opacity * outOpacity;
-
-  const isTitle = type === "title";
-  const isOutro = type === "outro";
+  // 进场弹跳
+  const scale = spring({
+    frame: frame - delay,
+    fps,
+    config: { damping: 12, stiffness: 200, mass: 0.5 }
+  });
+  
+  // 随机故障抖动
+  const isGlitch = frame > delay + 30 && frame % 15 < 3;
+  const skewX = isGlitch ? random(frame) * 20 - 10 : 0;
+  const translateX = isGlitch ? random(frame + 1) * 10 - 5 : 0;
+  const colorOffset = isGlitch ? '2px 2px 0px cyan, -2px -2px 0px red' : '4px 4px 0px rgba(0,0,0,0.2)';
+  
+  // 最终缩放 = 进场缩放 * 音乐节奏缩放
+  const finalScale = scale * beatScale;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        width: "100%",
-        textAlign: "center",
-        opacity: currentOpacity,
-        filter: `blur(${blur}px)`,
-        transform: `translateY(${translateY}px) scale(${outScale})`,
-      }}
-    >
-      {text.split("\n").map((line, i) => (
-        <h1
-          key={i}
-          style={{
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif",
-            color: "#1d1d1f", // Apple style dark text
-            fontSize: isTitle ? 90 : isOutro ? 80 : 70,
-            fontWeight: isTitle ? 700 : 500,
-            margin: "0 0 24px 0",
-            lineHeight: 1.2,
-            letterSpacing: "-0.03em",
-            whiteSpace: "pre-wrap",
-            textShadow: "0 10px 30px rgba(0,0,0,0.05)", // 极淡的阴影增加立体感
-          }}
-        >
-          {line}
-        </h1>
-      ))}
-      {isTitle && (
-        <div style={{ 
-          width: 80, 
-          height: 6, 
-          background: "#1d1d1f", 
-          marginTop: 40,
-          borderRadius: 3,
-          opacity: 0.1 
-        }} />
-      )}
-    </div>
+    <h1 style={{
+      fontFamily: '"Montserrat", "HarmonyOS", sans-serif',
+      fontWeight: 800,
+      fontSize: 80,
+      lineHeight: 1.1,
+      margin: 10,
+      color: '#111',
+      textTransform: 'uppercase',
+      transform: `scale(${finalScale}) skewX(${skewX}deg) translateX(${translateX}px)`,
+      textShadow: colorOffset,
+      backgroundColor: '#fff',
+      padding: '10px 20px',
+      border: '4px solid #000',
+      boxShadow: '8px 8px 0px #000',
+      display: 'inline-block'
+    }}>
+      {text}
+    </h1>
+  );
+};
+
+// 3. Emoji 炸弹
+const EmojiBomb = ({ emojis }: { emojis: string[] }) => {
+  const frame = useCurrentFrame();
+  const beatScale = useMusicBeat(); // 获取节奏
+
+  if (!emojis || emojis.length === 0) return null;
+
+  return (
+    <AbsoluteFill>
+      {emojis.map((emoji, i) => {
+        const seed = i * 123;
+        const x = random(seed) * 100; // 0-100%
+        const y = random(seed + 1) * 100; // 0-100%
+        const delay = i * 5;
+        
+        const scale = spring({
+          frame: frame - delay,
+          fps: 30,
+          config: { damping: 15, stiffness: 150 }
+        });
+        
+        const rotate = interpolate(frame, [0, 100], [0, random(seed + 2) > 0.5 ? 45 : -45]);
+        
+        // Emoji 对节奏更敏感，缩放更夸张
+        const finalScale = scale * (1 + (beatScale - 1) * 2);
+
+        return (
+          <div key={i} style={{
+            position: 'absolute',
+            left: `${x}%`,
+            top: `${y}%`,
+            fontSize: 120,
+            transform: `scale(${finalScale}) rotate(${rotate}deg)`,
+            opacity: scale
+          }}>
+            {emoji}
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
+
+// --- 主场景 ---
+
+const Scene = ({ text, duration, index }: { text: string; duration: number; index: number }) => {
+  // 根据文案自动匹配一些 Emoji (简单硬编码匹配)
+  const getEmojis = (txt: string) => {
+    if (txt.includes("玩意")) return ["😅", "🤔", "🤷‍♂️"];
+    if (txt.includes("Manus") || txt.includes("OpenCode")) return ["💻", "⌨️", "📦"];
+    if (txt.includes("Remotion") || txt.includes("Figma")) return ["🎨", "🎥", "🗡️"];
+    if (txt.includes("iOS") || txt.includes("Mac")) return ["🍎", "📱", "💸"];
+    if (txt.includes("AGI")) return ["🤖", "🤯", "💊"];
+    if (txt.includes("游戏")) return ["🎮", "🕹️", "👾"];
+    return ["✨", "⚡", "🔥"];
+  };
+
+  const emojis = getEmojis(text);
+
+  return (
+    <AbsoluteFill>
+      <CrazyBackground index={index} duration={duration} />
+      
+      {/* Emoji 层 */}
+      <EmojiBomb emojis={emojis} />
+
+      {/* 文字层 - 居中容器 */}
+      <AbsoluteFill style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        padding: 60
+      }}>
+        {text.split('\n').map((line, i) => (
+          <div key={i} style={{ transform: `rotate(${i % 2 === 0 ? '-2deg' : '2deg'})`, zIndex: 10 }}>
+            <GlitchText text={line} delay={i * 15} />
+          </div>
+        ))}
+      </AbsoluteFill>
+    </AbsoluteFill>
   );
 };
 
@@ -125,9 +218,10 @@ export const TechFatigue = () => {
 
   return (
     <AbsoluteFill>
-      <MinimalistBackground />
+      <Fonts />
       
-      {/* 直接引用 Audio 组件以确保播放 */}
+      {/* 音乐 - 必须有这个组件，useAudioData 才能读取到数据流，但实际上 Audio 组件只负责播放，useAudioData 负责分析文件 */}
+      {/* Remotion 推荐: <Audio /> 用于播放，useAudioData 独立读取源文件。 */}
       {config.audio.enabled && (
          <Audio 
            src={staticFile(config.audio.src)} 
@@ -142,7 +236,7 @@ export const TechFatigue = () => {
         
         return (
           <Sequence key={index} from={from} durationInFrames={scene.duration}>
-            <TextSlide text={scene.text} type={scene.type} duration={scene.duration} />
+            <Scene text={scene.text} duration={scene.duration} index={index} />
           </Sequence>
         );
       })}

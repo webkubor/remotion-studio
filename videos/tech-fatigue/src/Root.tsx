@@ -7,7 +7,7 @@ export const TechFatigueComposition = () => {
   return (
     <>
       <Composition
-        id="TechFatigue"
+        id="技术疲劳吐槽"
         component={TechFatigue}
         durationInFrames={config.video.durationInFrames}
         fps={config.video.fps}
