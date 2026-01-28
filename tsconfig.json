@@ -10,7 +10,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["videos/*"],
+      "@packages/*": ["packages/*"]
+    }
   },
   "exclude": ["remotion.config.ts"]
 }

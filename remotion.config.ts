@@ -5,6 +5,7 @@
 
 import { Config } from "@remotion/cli/config";
 import { enableTailwind } from "@remotion/tailwind-v4";
+import path from "path";
 
 // 设置默认入口点为 skills-intro 视频
 // 可以通过命令行参数覆盖：npx remotion studio videos/other-video/src/index.ts
@@ -19,8 +20,22 @@ Config.setVideoImageFormat("jpeg");
 // 覆盖已存在的输出文件
 Config.setOverwriteOutput(true);
 
-// 启用 Tailwind CSS v4
-Config.overrideWebpackConfig(enableTailwind);
+// 启用 Tailwind CSS v4 并配置别名
+Config.overrideWebpackConfig((currentConfiguration) => {
+  const configWithTailwind = enableTailwind(currentConfiguration);
+  
+  return {
+    ...configWithTailwind,
+    resolve: {
+      ...configWithTailwind.resolve,
+      alias: {
+        ...(configWithTailwind.resolve?.alias ?? {}),
+        "@": path.resolve(process.cwd(), "videos"),
+        "@packages": path.resolve(process.cwd(), "packages"),
+      },
+    },
+  };
+});
 
 // 设置并发数（根据 CPU 核心数自动调整）
 // 可以通过 --concurrency 参数覆盖

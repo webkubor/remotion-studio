@@ -2,18 +2,7 @@ import { AbsoluteFill, Sequence, interpolate, spring, useCurrentFrame, useVideoC
 import { useAudioData, visualizeAudio } from "@remotion/media-utils";
 import config from "../data/config.json";
 import { Fonts } from "./Fonts";
-
-// --- 配置色板 ---
-const COLORS = [
-  "#FFD700", // Gold
-  "#FF6B6B", // Red
-  "#4ECDC4", // Teal
-  "#FFE66D", // Yellow
-  "#1A535C", // Dark Blue
-  "#F7FFF7", // White-ish
-  "#FF9F1C", // Orange
-  "#2EC4B6"  // Cyan
-];
+import { MemphisColors } from "@packages/assets/colors/memphis";
 
 // --- 节奏提取 Hook ---
 const useMusicBeat = () => {
@@ -50,7 +39,7 @@ const CrazyBackground = ({ index, duration }: { index: number, duration: number 
   const frame = useCurrentFrame();
   const beatScale = useMusicBeat(); // 获取节奏
   
-  const baseColor = COLORS[index % COLORS.length];
+  const baseColor = MemphisColors.Palette[index % MemphisColors.Palette.length];
   
   // 简单的条纹纹理
   const stripeOffset = (frame * 2) % 100;
@@ -102,7 +91,9 @@ const GlitchText = ({ text, delay }: { text: string, delay: number }) => {
   const isGlitch = frame > delay + 30 && frame % 15 < 3;
   const skewX = isGlitch ? random(frame) * 20 - 10 : 0;
   const translateX = isGlitch ? random(frame + 1) * 10 - 5 : 0;
-  const colorOffset = isGlitch ? '2px 2px 0px cyan, -2px -2px 0px red' : '4px 4px 0px rgba(0,0,0,0.2)';
+  const colorOffset = isGlitch 
+    ? `2px 2px 0px ${MemphisColors.Glitch.Cyan}, -2px -2px 0px ${MemphisColors.Glitch.Red}` 
+    : `4px 4px 0px ${MemphisColors.Glitch.Dim}`;
   
   // 最终缩放 = 进场缩放 * 音乐节奏缩放
   const finalScale = scale * beatScale;
@@ -114,14 +105,14 @@ const GlitchText = ({ text, delay }: { text: string, delay: number }) => {
       fontSize: 80,
       lineHeight: 1.1,
       margin: 10,
-      color: '#111',
+      color: MemphisColors.Glitch.Primary,
       textTransform: 'uppercase',
       transform: `scale(${finalScale}) skewX(${skewX}deg) translateX(${translateX}px)`,
       textShadow: colorOffset,
-      backgroundColor: '#fff',
+      backgroundColor: MemphisColors.Glitch.Background,
       padding: '10px 20px',
-      border: '4px solid #000',
-      boxShadow: '8px 8px 0px #000',
+      border: `4px solid ${MemphisColors.Glitch.Shadow}`,
+      boxShadow: `8px 8px 0px ${MemphisColors.Glitch.Shadow}`,
       display: 'inline-block'
     }}>
       {text}
