@@ -5,7 +5,6 @@
 
 import { Config } from "@remotion/cli/config";
 import { enableTailwind } from "@remotion/tailwind-v4";
-import path from "path";
 
 // 设置默认入口点为 skills-intro 视频
 // 可以通过命令行参数覆盖：npx remotion studio videos/other-video/src/index.ts
@@ -53,28 +52,22 @@ Config.setPixelFormat("yuv420p");
 Config.setCodec("h264");
 
 // 设置 JPEG 质量（0-100）
-Config.setJPEGQuality(90);
+Config.setJpegQuality(90);
 
 // 设置图片序列模式
 Config.setImageSequence(false);
 
 // 设置图片序列模式下的图片格式
-Config.setImageFormat("jpeg");
+Config.setStillImageFormat("jpeg");
 
 // 设置图片序列模式下的图片序列模式
 Config.setImageSequencePattern("frame-[frame].[ext]");
 
 // 设置环境变量文件路径
-Config.setEnvFile(".env");
-
-// 设置配置文件路径
-Config.setConfig("./remotion.config.ts");
+Config.setDotEnvLocation(".env");
 
 // 设置输出目录
-Config.setOutputDir("./out");
-
-// 设置临时目录
-Config.setTempDir("./.remotion");
+Config.setOutputLocation("./out");
 
 // 设置浏览器可执行文件路径
 // Config.setBrowserExecutable('/path/to/chrome');
