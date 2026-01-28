@@ -8,7 +8,7 @@ import { enableTailwind } from "@remotion/tailwind-v4";
 
 // 设置默认入口点为 skills-intro 视频
 // 可以通过命令行参数覆盖：npx remotion studio videos/other-video/src/index.ts
-Config.setEntryPoint("./videos/skills-intro/src/index.ts");
+Config.setEntryPoint("./videos/index.ts");
 
 // 设置公共目录
 Config.setPublicDir("./public");

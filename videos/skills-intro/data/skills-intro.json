@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "id": "SkillsIntro",
+    "title": "Skills",
+    "subtitle": "技术分享系列",
+    "tagline": "Skill Series"
+  },
+  "video": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 750
+  },
+  "theme": {
+    "fonts": {
+      "display": "\"New York\", \"Times New Roman\", \"Songti SC\", serif",
+      "body": "\"Avenir Next\", \"Avenir\", \"PingFang SC\", \"Helvetica Neue\", sans-serif"
+    },
+    "colors": {
+      "background": "#0a0b10",
+      "text": "#f5f6fa",
+      "textSecondary": "#a8b0c3",
+      "accent": "#6c8cff",
+      "accentAlt": "#42e8c3",
+      "surface": "#141826",
+      "surfaceHi": "#1b2233",
+      "border": "rgba(255, 255, 255, 0.08)"
+    }
+  },
+  "audio": {
+    "enabled": true,
+    "src": "温柔.wav",
+    "volume": 0.8,
+    "startFrame": 0
+  },
+  "timeline": {
+    "opening": { "from": 0, "duration": 90 },
+    "whatIs": { "from": 90, "duration": 180 },
+    "coreFeatures": { "from": 270, "duration": 180 },
+    "techStack": { "from": 450, "duration": 150 },
+    "summary": { "from": 600, "duration": 150 }
+  },
+  "scenes": {
+    "whatIs": {
+      "title": "什么是 Skills？",
+      "cards": [
+        {
+          "icon": "🎯",
+          "title": "核心概念",
+          "desc": "现代化的技术能力评估和展示平台",
+          "delay": 30
+        },
+        {
+          "icon": "💡",
+          "title": "主要目标",
+          "desc": "帮助开发者系统化地管理和展示技术技能",
+          "delay": 60
+        },
+        {
+          "icon": "🚀",
+          "title": "应用场景",
+          "desc": "技术面试、职业发展、团队协作",
+          "delay": 90
+        }
+      ]
+    },
+    "coreFeatures": {
+      "title": "核心特性",
+      "items": [
+        { "icon": "📊", "title": "技能评估", "desc": "多维度评估技术能力", "delay": 30 },
+        { "icon": "🎨", "title": "可视化展示", "desc": "直观展示技能图谱", "delay": 50 },
+        { "icon": "📈", "title": "成长追踪", "desc": "记录技能提升轨迹", "delay": 70 },
+        { "icon": "🤝", "title": "团队协作", "desc": "共享技能资源", "delay": 90 }
+      ]
+    },
+    "techStack": {
+      "title": "技术栈",
+      "items": [
+        { "name": "React", "color": "#61DAFB", "delay": 30 },
+        { "name": "TypeScript", "color": "#3178C6", "delay": 45 },
+        { "name": "Node.js", "color": "#339933", "delay": 60 },
+        { "name": "GraphQL", "color": "#E10098", "delay": 75 },
+        { "name": "PostgreSQL", "color": "#336791", "delay": 90 },
+        { "name": "Docker", "color": "#2496ED", "delay": 105 }
+      ]
+    },
+    "summary": {
+      "title": "开始使用 Skills",
+      "points": [
+        "📚 系统化管理你的技术能力",
+        "🎯 精准评估和展示技能",
+        "🚀 加速职业发展"
+      ],
+      "cta": "立即开始 →"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "meta": {
+    "title": "Tech Fatigue",
+    "subtitle": "别再整新玩意儿了"
+  },
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "durationInFrames": 900
+  },
+  "theme": {
+    "colors": {
+      "background": "#FFFFFF",
+      "text": "#111111",
+      "textSecondary": "#666666",
+      "accent": "#000000",
+      "accentAlt": "#333333",
+      "surface": "#F5F5F7",
+      "surfaceHi": "#EEEEEE",
+      "border": "#E5E5E5"
+    },
+    "fonts": {
+      "display": "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif",
+      "body": "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+    }
+  },
+  "audio": {
+    "enabled": true,
+    "src": "温柔.wav",
+    "volume": 0.6,
+    "startFrame": 0
+  },
+  "scenes": [
+    {
+      "text": "求求你们了，\n别再整新玩意儿了😅",
+      "duration": 120,
+      "type": "title"
+    },
+    {
+      "text": "Manus 没用过\nOpenCode 还没装",
+      "duration": 90
+    },
+    {
+      "text": "Cowork 还没捂热\n又来个 Clawdbot",
+      "duration": 90
+    },
+    {
+      "text": "前脚 Remotion 干翻剪映\n后脚 Pencili 钉到 Figma",
+      "duration": 90
+    },
+    {
+      "text": "去年前端已死\n今年 iOS 爆发",
+      "duration": 90
+    },
+    {
+      "text": "上周嘲笑苹果\n这周下单 Mac",
+      "duration": 90
+    },
+    {
+      "text": "每天都革了昨天的命\n日日都是 AGI FML",
+      "duration": 120
+    },
+    {
+      "text": "你们是不是忘记\n这世界上还有游戏了？",
+      "duration": 150,
+      "type": "outro"
+    }
+  ]
+}

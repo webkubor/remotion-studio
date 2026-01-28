@@ -1,28 +1,52 @@
 import {
   AbsoluteFill,
-  useCurrentFrame,
-  useVideoConfig,
+  Sequence,
   interpolate,
   spring,
-  Sequence,
+  useCurrentFrame,
+  useVideoConfig,
 } from "remotion";
+import type { ReactElement } from "react";
+import { Background } from "../../packages/video-kit";
+import { AudioTrack } from "./components/AudioTrack";
+import { Scene } from "./components/Scene";
+import skillsIntroConfig from "./data/skills-intro.json";
+import { getTheme, type Theme } from "./styles/theme";
+import type { SkillsIntroConfig } from "./types";
 
-// 苹果风格的颜色系统
-const colors = {
-  background: "#000000",
-  text: "#ffffff",
-  textSecondary: "#86868b",
-  accent: "#0071e3",
-  card: "#1d1d1f",
-  cardHover: "#2d2d2f",
+export type SkillsIntroProps = {
+  config?: SkillsIntroConfig;
 };
 
-// 场景1：开场标题 - 苹果风格
-const OpeningScene = () => {
+type OpeningSceneProps = {
+  theme: Theme;
+  meta: SkillsIntroConfig["meta"];
+};
+
+type WhatIsSkillsProps = {
+  theme: Theme;
+  scene: SkillsIntroConfig["scenes"]["whatIs"];
+};
+
+type CoreFeaturesProps = {
+  theme: Theme;
+  scene: SkillsIntroConfig["scenes"]["coreFeatures"];
+};
+
+type TechStackProps = {
+  theme: Theme;
+  scene: SkillsIntroConfig["scenes"]["techStack"];
+};
+
+type SummaryProps = {
+  theme: Theme;
+  scene: SkillsIntroConfig["scenes"]["summary"];
+};
+
+const OpeningScene = ({ theme, meta }: OpeningSceneProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // 标题淡入和缩放动画
   const titleOpacity = interpolate(frame, [0, 45], [0, 1], {
     extrapolateRight: "clamp",
   });
@@ -32,7 +56,6 @@ const OpeningScene = () => {
     config: { damping: 200, stiffness: 100 },
   });
 
-  // 副标题淡入
   const subtitleOpacity = interpolate(frame, [30, 75], [0, 1], {
     extrapolateRight: "clamp",
   });
@@ -41,56 +64,74 @@ const OpeningScene = () => {
   });
 
   return (
-    <AbsoluteFill
+    <Scene
+      theme={theme}
       style={{
-        backgroundColor: colors.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        padding: 140,
+        textAlign: "center",
       }}
     >
-      <h1
+      <div
         style={{
-          color: colors.text,
-          fontSize: 140,
-          fontWeight: 600,
-          opacity: titleOpacity,
-          transform: `scale(${titleScale})`,
-          textAlign: "center",
-          margin: 0,
-          letterSpacing: "-2px",
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          padding: "10px 22px",
+          borderRadius: 999,
+          border: `1px solid ${theme.colors.border}`,
+          background: "rgba(255, 255, 255, 0.04)",
+          color: theme.colors.textSecondary,
+          fontSize: 16,
+          letterSpacing: "0.32em",
+          textTransform: "uppercase",
+          fontFamily: theme.fonts.body,
+          opacity: subtitleOpacity,
+          marginBottom: 28,
         }}
       >
-        Skills
+        {meta.tagline}
+      </div>
+      <h1
+        style={{
+          fontSize: 160,
+          fontWeight: 700,
+          opacity: titleOpacity,
+          transform: `scale(${titleScale})`,
+          margin: 0,
+          lineHeight: 0.95,
+          letterSpacing: "-2.5px",
+          fontFamily: theme.fonts.display,
+          backgroundImage: `linear-gradient(135deg, ${theme.colors.accent}, ${theme.colors.accentAlt})`,
+          WebkitBackgroundClip: "text",
+          color: "transparent",
+          WebkitTextFillColor: "transparent",
+          textShadow: "0 20px 60px rgba(108, 140, 255, 0.25)",
+        }}
+      >
+        {meta.title}
       </h1>
       <p
         style={{
-          color: colors.textSecondary,
-          fontSize: 32,
+          color: theme.colors.textSecondary,
+          fontSize: 34,
           marginTop: 24,
           opacity: subtitleOpacity,
           transform: `translateY(${subtitleY}px)`,
-          textAlign: "center",
-          fontWeight: 400,
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          fontWeight: 500,
+          letterSpacing: "0.06em",
+          fontFamily: theme.fonts.body,
         }}
       >
-        技术分享系列
+        {meta.subtitle}
       </p>
-    </AbsoluteFill>
+    </Scene>
   );
 };
 
-// 场景2：什么是 Skills - 苹果风格卡片
-const WhatIsSkills = () => {
+const WhatIsSkills = ({ theme, scene }: WhatIsSkillsProps) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
-  // 标题动画
   const titleOpacity = interpolate(frame, [0, 30], [0, 1], {
     extrapolateRight: "clamp",
   });
@@ -98,32 +139,10 @@ const WhatIsSkills = () => {
     extrapolateRight: "clamp",
   });
 
-  // 卡片依次出现
-  const cards = [
-    {
-      icon: "🎯",
-      title: "核心概念",
-      desc: "现代化的技术能力评估和展示平台",
-      delay: 30,
-    },
-    {
-      icon: "💡",
-      title: "主要目标",
-      desc: "帮助开发者系统化地管理和展示技术技能",
-      delay: 60,
-    },
-    {
-      icon: "🚀",
-      title: "应用场景",
-      desc: "技术面试、职业发展、团队协作",
-      delay: 90,
-    },
-  ];
-
   return (
-    <AbsoluteFill
+    <Scene
+      theme={theme}
       style={{
-        backgroundColor: colors.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -132,18 +151,17 @@ const WhatIsSkills = () => {
     >
       <h2
         style={{
-          color: colors.text,
-          fontSize: 72,
-          fontWeight: 600,
+          color: theme.colors.text,
+          fontSize: 76,
+          fontWeight: 700,
           marginBottom: 80,
           opacity: titleOpacity,
           transform: `translateY(${titleY}px)`,
-          letterSpacing: "-1px",
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          letterSpacing: "-1.5px",
+          fontFamily: theme.fonts.display,
         }}
       >
-        什么是 Skills？
+        {scene.title}
       </h2>
 
       <div
@@ -155,15 +173,15 @@ const WhatIsSkills = () => {
           maxWidth: 1200,
         }}
       >
-        {cards.map((card, index) => {
-          const startFrame = card.delay;
+        {scene.cards.map((card, index) => {
+          const startFrame = card.delay ?? index * 30;
           const cardOpacity = interpolate(
             frame,
             [startFrame, startFrame + 30],
             [0, 1],
             {
               extrapolateRight: "clamp",
-            },
+            }
           );
           const cardY = interpolate(
             frame,
@@ -171,47 +189,46 @@ const WhatIsSkills = () => {
             [40, 0],
             {
               extrapolateRight: "clamp",
-            },
+            }
           );
 
           return (
             <div
-              key={index}
+              key={`${card.title}-${index}`}
               style={{
-                backgroundColor: colors.card,
-                padding: 48,
-                borderRadius: 24,
+                background: `linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 45%), linear-gradient(135deg, ${theme.colors.surface} 0%, ${theme.colors.surfaceHi} 100%)`,
+                padding: 52,
+                borderRadius: 28,
+                border: `1px solid ${theme.colors.border}`,
                 opacity: cardOpacity,
                 transform: `translateY(${cardY}px)`,
-                transition: "all 0.3s ease",
+                boxShadow: "0 24px 70px rgba(7, 10, 20, 0.6)",
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <div
-                style={{ display: "flex", alignItems: "flex-start", gap: 24 }}
-              >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 24 }}>
                 <span style={{ fontSize: 48, lineHeight: 1 }}>{card.icon}</span>
                 <div style={{ flex: 1 }}>
                   <h3
                     style={{
-                      color: colors.text,
+                      color: theme.colors.text,
                       fontSize: 36,
-                      fontWeight: 600,
+                      fontWeight: 650,
                       margin: 0,
                       marginBottom: 12,
-                      fontFamily:
-                        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                      fontFamily: theme.fonts.display,
                     }}
                   >
                     {card.title}
                   </h3>
                   <p
                     style={{
-                      color: colors.textSecondary,
+                      color: theme.colors.textSecondary,
                       fontSize: 24,
                       margin: 0,
                       lineHeight: 1.5,
-                      fontFamily:
-                        "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                      fontFamily: theme.fonts.body,
                     }}
                   >
                     {card.desc}
@@ -222,12 +239,11 @@ const WhatIsSkills = () => {
           );
         })}
       </div>
-    </AbsoluteFill>
+    </Scene>
   );
 };
 
-// 场景3：核心特性 - 苹果风格网格
-const CoreFeatures = () => {
+const CoreFeatures = ({ theme, scene }: CoreFeaturesProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -235,17 +251,10 @@ const CoreFeatures = () => {
     extrapolateRight: "clamp",
   });
 
-  const features = [
-    { icon: "📊", title: "技能评估", desc: "多维度评估技术能力" },
-    { icon: "🎨", title: "可视化展示", desc: "直观展示技能图谱" },
-    { icon: "📈", title: "成长追踪", desc: "记录技能提升轨迹" },
-    { icon: "🤝", title: "团队协作", desc: "共享技能资源" },
-  ];
-
   return (
-    <AbsoluteFill
+    <Scene
+      theme={theme}
       style={{
-        backgroundColor: colors.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -254,17 +263,16 @@ const CoreFeatures = () => {
     >
       <h2
         style={{
-          color: colors.text,
-          fontSize: 72,
-          fontWeight: 600,
+          color: theme.colors.text,
+          fontSize: 76,
+          fontWeight: 700,
           marginBottom: 80,
           opacity: titleOpacity,
-          letterSpacing: "-1px",
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          letterSpacing: "-1.5px",
+          fontFamily: theme.fonts.display,
         }}
       >
-        核心特性
+        {scene.title}
       </h2>
 
       <div
@@ -276,15 +284,15 @@ const CoreFeatures = () => {
           maxWidth: 1400,
         }}
       >
-        {features.map((feature, index) => {
-          const startFrame = 30 + index * 20;
+        {scene.items.map((feature, index) => {
+          const startFrame = feature.delay ?? 30 + index * 20;
           const featureOpacity = interpolate(
             frame,
             [startFrame, startFrame + 30],
             [0, 1],
             {
               extrapolateRight: "clamp",
-            },
+            }
           );
           const featureScale = spring({
             frame: frame - startFrame,
@@ -294,13 +302,15 @@ const CoreFeatures = () => {
 
           return (
             <div
-              key={index}
+              key={`${feature.title}-${index}`}
               style={{
-                backgroundColor: colors.card,
+                background: `linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 45%), linear-gradient(135deg, ${theme.colors.surface} 0%, ${theme.colors.surfaceHi} 100%)`,
                 padding: 56,
-                borderRadius: 24,
+                borderRadius: 28,
+                border: `1px solid ${theme.colors.border}`,
                 opacity: featureOpacity,
                 transform: `scale(${featureScale})`,
+                boxShadow: "0 30px 80px rgba(6, 9, 18, 0.55)",
               }}
             >
               <div style={{ fontSize: 64, marginBottom: 24, lineHeight: 1 }}>
@@ -308,25 +318,23 @@ const CoreFeatures = () => {
               </div>
               <h3
                 style={{
-                  color: colors.text,
+                  color: theme.colors.text,
                   fontSize: 40,
-                  fontWeight: 600,
+                  fontWeight: 650,
                   margin: 0,
                   marginBottom: 16,
-                  fontFamily:
-                    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  fontFamily: theme.fonts.display,
                 }}
               >
                 {feature.title}
               </h3>
               <p
                 style={{
-                  color: colors.textSecondary,
+                  color: theme.colors.textSecondary,
                   fontSize: 24,
                   margin: 0,
                   lineHeight: 1.5,
-                  fontFamily:
-                    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  fontFamily: theme.fonts.body,
                 }}
               >
                 {feature.desc}
@@ -335,12 +343,11 @@ const CoreFeatures = () => {
           );
         })}
       </div>
-    </AbsoluteFill>
+    </Scene>
   );
 };
 
-// 场景4：技术栈 - 苹果风格圆形徽章
-const TechStack = () => {
+const TechStack = ({ theme, scene }: TechStackProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -348,19 +355,10 @@ const TechStack = () => {
     extrapolateRight: "clamp",
   });
 
-  const techs = [
-    { name: "React", color: "#61DAFB" },
-    { name: "TypeScript", color: "#3178C6" },
-    { name: "Node.js", color: "#339933" },
-    { name: "GraphQL", color: "#E10098" },
-    { name: "PostgreSQL", color: "#336791" },
-    { name: "Docker", color: "#2496ED" },
-  ];
-
   return (
-    <AbsoluteFill
+    <Scene
+      theme={theme}
       style={{
-        backgroundColor: colors.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -369,17 +367,16 @@ const TechStack = () => {
     >
       <h2
         style={{
-          color: colors.text,
-          fontSize: 72,
-          fontWeight: 600,
+          color: theme.colors.text,
+          fontSize: 76,
+          fontWeight: 700,
           marginBottom: 80,
           opacity: titleOpacity,
-          letterSpacing: "-1px",
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          letterSpacing: "-1.5px",
+          fontFamily: theme.fonts.display,
         }}
       >
-        技术栈
+        {scene.title}
       </h2>
 
       <div
@@ -391,15 +388,15 @@ const TechStack = () => {
           maxWidth: 1400,
         }}
       >
-        {techs.map((tech, index) => {
-          const startFrame = 30 + index * 15;
+        {scene.items.map((tech, index) => {
+          const startFrame = tech.delay ?? 30 + index * 15;
           const techOpacity = interpolate(
             frame,
             [startFrame, startFrame + 30],
             [0, 1],
             {
               extrapolateRight: "clamp",
-            },
+            }
           );
           const scale = spring({
             frame: frame - startFrame,
@@ -409,23 +406,24 @@ const TechStack = () => {
 
           return (
             <div
-              key={index}
+              key={`${tech.name}-${index}`}
               style={{
-                backgroundColor: tech.color,
-                padding: "32px 64px",
+                background: `linear-gradient(135deg, ${tech.color}22 0%, rgba(15, 18, 30, 0.9) 60%)`,
+                padding: "30px 62px",
                 borderRadius: 100,
+                border: `1px solid ${tech.color}66`,
                 opacity: techOpacity,
                 transform: `scale(${scale})`,
-                boxShadow: `0 4px 20px ${tech.color}40`,
+                boxShadow: `0 18px 50px ${tech.color}40`,
               }}
             >
               <span
                 style={{
                   color: "white",
-                  fontSize: 36,
+                  fontSize: 34,
                   fontWeight: 600,
-                  fontFamily:
-                    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  letterSpacing: "0.02em",
+                  fontFamily: theme.fonts.body,
                 }}
               >
                 {tech.name}
@@ -434,12 +432,11 @@ const TechStack = () => {
           );
         })}
       </div>
-    </AbsoluteFill>
+    </Scene>
   );
 };
 
-// 场景5：总结 - 苹果风格 CTA
-const Summary = () => {
+const Summary = ({ theme, scene }: SummaryProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
@@ -469,31 +466,30 @@ const Summary = () => {
   });
 
   return (
-    <AbsoluteFill
+    <Scene
+      theme={theme}
       style={{
-        backgroundColor: colors.background,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         padding: 120,
+        textAlign: "center",
       }}
     >
       <h2
         style={{
-          color: colors.text,
-          fontSize: 96,
-          fontWeight: 600,
+          color: theme.colors.text,
+          fontSize: 104,
+          fontWeight: 700,
           marginBottom: 60,
           opacity: titleOpacity,
           transform: `scale(${titleScale})`,
-          textAlign: "center",
-          letterSpacing: "-1px",
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          letterSpacing: "-1.5px",
+          fontFamily: theme.fonts.display,
         }}
       >
-        开始使用 Skills
+        {scene.title}
       </h2>
 
       <div
@@ -504,50 +500,34 @@ const Summary = () => {
           marginBottom: 60,
         }}
       >
-        <p
-          style={{
-            color: colors.textSecondary,
-            fontSize: 32,
-            marginBottom: 24,
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-          }}
-        >
-          📚 系统化管理你的技术能力
-        </p>
-        <p
-          style={{
-            color: colors.textSecondary,
-            fontSize: 32,
-            marginBottom: 24,
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-          }}
-        >
-          🎯 精准评估和展示技能
-        </p>
-        <p
-          style={{
-            color: colors.textSecondary,
-            fontSize: 32,
-            marginBottom: 0,
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-          }}
-        >
-          🚀 加速职业发展
-        </p>
+        {scene.points.map((point, index): ReactElement => {
+          const isLast = index === scene.points.length - 1;
+          return (
+            <p
+              key={`${point}-${index}`}
+              style={{
+                color: theme.colors.textSecondary,
+                fontSize: 32,
+                marginBottom: isLast ? 0 : 24,
+                fontFamily: theme.fonts.body,
+              }}
+            >
+              {point}
+            </p>
+          );
+        })}
       </div>
 
       <div
         style={{
-          padding: "24px 64px",
-          backgroundColor: colors.accent,
+          padding: "22px 64px",
+          background: `linear-gradient(135deg, ${theme.colors.accent} 0%, ${theme.colors.accentAlt} 100%)`,
           borderRadius: 50,
+          border: "1px solid rgba(255, 255, 255, 0.2)",
           opacity: buttonOpacity,
           transform: `scale(${buttonScale})`,
           cursor: "pointer",
-          transition: "all 0.3s ease",
+          boxShadow: "0 18px 50px rgba(66, 232, 195, 0.35)",
         }}
       >
         <span
@@ -555,44 +535,47 @@ const Summary = () => {
             color: "white",
             fontSize: 32,
             fontWeight: 600,
-            fontFamily:
-              "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            letterSpacing: "0.02em",
+            fontFamily: theme.fonts.body,
           }}
         >
-          立即开始 →
+          {scene.cta}
         </span>
       </div>
-    </AbsoluteFill>
+    </Scene>
   );
 };
 
-// 主组件
-export const SkillsIntro = () => {
+export const SkillsIntro = ({ config = skillsIntroConfig }: SkillsIntroProps) => {
+  const theme = getTheme(config);
+  const { timeline, scenes, meta } = config;
+
   return (
     <AbsoluteFill>
-      {/* 场景1：开场标题 - 0-90帧（3秒） */}
-      <Sequence from={0} durationInFrames={90}>
-        <OpeningScene />
+      <Background theme={theme} />
+      <AudioTrack audio={config.audio} />
+
+      <Sequence from={timeline.opening.from} durationInFrames={timeline.opening.duration}>
+        <OpeningScene theme={theme} meta={meta} />
       </Sequence>
 
-      {/* 场景2：什么是 Skills - 90-270帧（6秒） */}
-      <Sequence from={90} durationInFrames={180}>
-        <WhatIsSkills />
+      <Sequence from={timeline.whatIs.from} durationInFrames={timeline.whatIs.duration}>
+        <WhatIsSkills theme={theme} scene={scenes.whatIs} />
       </Sequence>
 
-      {/* 场景3：核心特性 - 270-450帧（6秒） */}
-      <Sequence from={270} durationInFrames={180}>
-        <CoreFeatures />
+      <Sequence
+        from={timeline.coreFeatures.from}
+        durationInFrames={timeline.coreFeatures.duration}
+      >
+        <CoreFeatures theme={theme} scene={scenes.coreFeatures} />
       </Sequence>
 
-      {/* 场景4：技术栈 - 450-600帧（5秒） */}
-      <Sequence from={450} durationInFrames={150}>
-        <TechStack />
+      <Sequence from={timeline.techStack.from} durationInFrames={timeline.techStack.duration}>
+        <TechStack theme={theme} scene={scenes.techStack} />
       </Sequence>
 
-      {/* 场景5：总结 - 600-750帧（5秒） */}
-      <Sequence from={600} durationInFrames={150}>
-        <Summary />
+      <Sequence from={timeline.summary.from} durationInFrames={timeline.summary.duration}>
+        <Summary theme={theme} scene={scenes.summary} />
       </Sequence>
     </AbsoluteFill>
   );
